@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -11,9 +11,8 @@
     />
     <link rel="stylesheet" href="src/style.css" />
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
-    <title>Weather App</title>
+    <title>Vanilla Weather App</title>
   </head>
-
   <body>
     <div class="container">
       <div class="weather-app-wrapper">
@@ -23,11 +22,10 @@
               <div class="col-9">
                 <input
                   type="search"
-                  placeholder="Type a city.."
+                  placeholder="Type a city..."
                   class="form-control"
                   id="city-input"
                   autocomplete="off"
-                  autofocus="off"
                 />
               </div>
               <div class="col-3">
@@ -61,8 +59,8 @@
             </div>
             <div class="col-md-6">
               <ul>
-                <li>Humidity: <span id="Humidity"></span>%</li>
-                <li>Wind: <span id="WindSpeed"></span>km/h</li>
+                <li>Humidity: <span id="humidity"></span>%</li>
+                <li>Wind: <span id="wind"></span>km/h</li>
               </ul>
             </div>
           </div>
@@ -70,7 +68,6 @@
         <small>
           <a
             href="https://github.com/ChandreLesch/vanilla-weather-app"
-            z
             target="_blank"
             >Open-source code,</a
           >

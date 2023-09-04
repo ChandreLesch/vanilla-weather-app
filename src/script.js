@@ -1,93 +1,89 @@
-let now = new Date();
-
-let span = document.getElementById("dateTimeNow");
-
-let date = now.getDate();
-let hours = now.getHours();
-let minutes = now.getMinutes();
-
-let days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thu", "Fri", "Sat"];
-let day = days[now.getDay()];
-
-let apiKey = "c4b172eedcc31d3b2dcffd5a7db9d456";
-
-span.innerHTML = `${day} ${date} ${hours}:${minutes}`;
-
-function search(event) {
-  event.preventDefault();
-
-  let searchInput = document.querySelector("#search-text-input");
-
-  let h1 = document.querySelector("h1");
-  h1.innerHTML = `${searchInput.value}`;
-
-  let searchButtonClickUrl = `https://api.openweathermap.org/data/2.5/weather?q=${searchInput.value}&appid=${apiKey}&units=metric`;
-  axios.get(`${searchButtonClickUrl}`).then(showSearchTemperature);
+function formatDate(timestamp) {
+  let date = new Date(timestamp);
+  let hours = date.getHours();
+  if (hours < 10) {
+    hours = `0${hours}`;
+  }
+  let minutes = date.getMinutes();
+  if (minutes < 10) {
+    minutes = `0${minutes}`;
+  }
+  let days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  let day = days[date.getDay()];
+  return `${day} ${hours}:${minutes}`;
 }
+
+function displayTemperature(response) {
+  let temperatureElement = document.querySelector("#temperature");
+  let cityElement = document.querySelector("#city");
+  let descriptionElement = document.querySelector("#description");
+  let humidityElement = document.querySelector("#humidity");
+  let windElement = document.querySelector("#wind");
+  let dateElement = document.querySelector("#date");
+  let iconElement = document.querySelector("#icon");
+
+  celciusTemperature = response.data.main.temp;
+
+  temperatureElement.innerHTML = Math.round(celciusTemperature);
+  cityElement.innerHTML = response.data.name;
+  descriptionElement.innerHTML = response.data.weather[0].description;
+  humidityElement.innerHTML = response.data.main.humidity;
+  windElement.innerHTML = Math.round(response.data.wind.speed);
+  dateElement.innerHTML = formatDate(response.data.dt * 1000);
+  iconElement.setAttribute(
+    "src",
+    `http://openweathermap.org/img/wn/${response.data.weather[0].icon}@2x.png`
+  );
+  iconElement.setAttribute("alt", response.data.weather[0].description);
+}
+
+function search(city) {
+  let apiKey = "c4b172eedcc31d3b2dcffd5a7db9d456";
+  let apiUrl = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`;
+  //let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${apiKey}&units=metric`;
+  axios.get(apiUrl).then(displayTemperature);
+}
+
+function handleSubmit(event) {
+  event.preventDefault();
+  let cityInputElement = document.querySelector("#city-input");
+  search(cityInputElement.value);
+}
+
+function displayFahrenheitTemperature(event) {
+  event.preventDefault();
+  let temperatureElement = document.querySelector("#temperature");
+  celciusLink.classList.remove("active");
+  fahrenheitLink.classList.add("active");
+  let fahrenheitTemperature = (celciusTemperature * 9) / 5 + 32;
+  temperatureElement.innerHTML = Math.round(fahrenheitTemperature);
+}
+
+function displayCelciusTemperature(event) {
+  event.preventDefault();
+  celciusLink.classList.add("active");
+  fahrenheitLink.classList.remove("active");
+  let temperatureElement = document.querySelector("#temperature");
+  temperatureElement.innerHTML = Math.round(celciusTemperature);
+}
+
+let celciusTemperature = null;
 
 let form = document.querySelector("#search-form");
-form.addEventListener("submit", search);
+form.addEventListener("submit", handleSubmit);
 
-function showSearchTemperature(response) {
-  let temperature = Math.round(response.data.main.temp);
-  let humidity = response.data.main.humidity;
-  let wind = response.data.wind.speed;
+let fahrenheitLink = document.querySelector("#fahrenheit-link");
+fahrenheitLink.addEventListener("click", displayFahrenheitTemperature);
 
-  let temperatureElement = document.querySelector("#temperature");
-  let Humidity = document.querySelector("#Humidity");
-  let WindSpeed = document.querySelector("#WindSpeed");
-  let description = document.querySelector("#temperature-description");
-  let h1 = document.querySelector("#city");
+let celciusLink = document.querySelector("#celcius-link");
+celciusLink.addEventListener("click", displayCelciusTemperature);
 
-  temperatureElement.innerHTML = `${temperature}°C`;
-  description.innerHTML = response.data.weather[0].description;
-  Humidity.innerHTML = `${humidity}%`;
-  WindSpeed.innerHTML = `${wind}km/h`;
-  h1.innerHTML = response.data.name;
-}
-
-function showCurrentTemperature(response) {
-  let temperature = Math.round(response.data.main.temp);
-  let humidity = response.data.main.humidity;
-  let wind = response.data.wind.speed;
-
-  let temperatureElement = document.querySelector("#temperature");
-  let description = document.querySelector("#temperature-description");
-  let h1 = document.querySelector("#city");
-  let Humidity = document.querySelector("#Humidity");
-  let WindSpeed = document.querySelector("#WindSpeed");
-
-  temperatureElement.innerHTML = `${temperature}°C`;
-  description.innerHTML = response.data.weather[0].description;
-  h1.innerHTML = response.data.name;
-  Humidity.innerHTML = `${humidity}%`;
-  WindSpeed.innerHTML = `${wind}km/h`;
-}
-
-let long = "";
-let lat = "";
-
-function currentLocation(event) {
-  lat = event.coords.latitude;
-  long = event.coords.longitude;
-}
-navigator.geolocation.getCurrentPosition(currentLocation);
-
-function searchLocation(position) {
-  let apiKey = "c4b172eedcc31d3b2dcffd5a7db9d456";
-  let apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${position.coords.latitude}&lon=${position.coords.longitude}&appid=${apiKey}&units=metric`;
-}
-
-function getCurrentLocation(event) {
-  event.preventDefault();
-  navigator.geolocation.getCurrentPosition(searchLocation);
-}
-
-let currentUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${long}&appid=${apiKey}&units=metric`;
-
-let currentButtonClick = document.querySelector("#currentButton");
-currentButtonClick.addEventListener(
-  "click",
-  getCurrentLocation,
-  axios.get(`${currentUrl}`).then(showCurrentTemperature)
-);
+search("Cape Town");
